@@ -57,35 +57,33 @@ export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        screenOptions={({ route }) => (
-          {
-            tabBarIcon: ({ focused, color, size }) => {
-              let iconName;
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
 
-              if (route.name === 'Home') {
-                iconName = focused ? 'home' : 'home-outline';
-              } else if (route.name === 'History') {
-                iconName = focused ? 'calendar' : 'calendar-outline';
-              } else if (route.name === 'Stats') {
-                iconName = focused ? 'chart-line' : 'chart-line';
-              } else if (route.name === 'Plano') {
-                iconName = focused ? 'dumbbell' : 'dumbbell';
-              } else if (route.name === 'Clock') {
-                iconName = focused ? 'clock-digital' : 'clock-outline';
-              }
-
-              return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
-            },
-            tabBarActiveTintColor: '#FF6B6B',
-            tabBarInactiveTintColor: '#999',
-            headerShown: false,
-            tabBarStyle: {
-              backgroundColor: '#fff',
-              borderTopColor: '#eee',
-              borderTopWidth: 1,
+            if (route.name === 'Home') {
+              iconName = focused ? 'home' : 'home-outline';
+            } else if (route.name === 'History') {
+              iconName = focused ? 'calendar' : 'calendar-outline';
+            } else if (route.name === 'Stats') {
+              iconName = focused ? 'chart-line' : 'chart-line';
+            } else if (route.name === 'Plano') {
+              iconName = focused ? 'dumbbell' : 'dumbbell';
+            } else if (route.name === 'Clock') {
+              iconName = focused ? 'clock-digital' : 'clock-outline';
             }
+
+            return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: '#FF6B6B',
+          tabBarInactiveTintColor: '#999',
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: '#fff',
+            borderTopColor: '#eee',
+            borderTopWidth: 1,
           }
-        )}
+        })}
       >
         <Tab.Screen 
           name="Home" 
