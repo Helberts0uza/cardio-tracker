@@ -20,6 +20,7 @@ export default function WorkoutScreen({ profile, onWorkoutComplete }: WorkoutScr
   const [currentHeartRate, setCurrentHeartRate] = useState(profile.targetHeartRateMin);
   const [heartRateReadings, setHeartRateReadings] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('Ready to train.');
   const startAtRef = useRef<Date | null>(null);
 
   useEffect(() => {
@@ -28,13 +29,15 @@ export default function WorkoutScreen({ profile, onWorkoutComplete }: WorkoutScr
     }
 
     const id = setInterval(() => {
-      setElapsedSeconds((seconds) => seconds + 1);
-      setCurrentHeartRate((previous) => {
-        const variation = Math.floor(Math.random() * 13) - 6;
-        const next = previous + variation;
-        const bounded = Math.max(profile.targetHeartRateMin - 20, Math.min(profile.targetHeartRateMax + 12, next));
+      setElapsedSeconds((seconds) => {
+        const nextSeconds = seconds + 1;
+        const zoneMidpoint = (profile.targetHeartRateMin + profile.targetHeartRateMax) / 2;
+        const amplitude = Math.max(8, Math.round((profile.targetHeartRateMax - profile.targetHeartRateMin) / 2));
+        const nextHeartRate = Math.round(zoneMidpoint + Math.sin(nextSeconds / 2.2) * amplitude);
+        const bounded = Math.max(profile.targetHeartRateMin - 20, Math.min(profile.targetHeartRateMax + 12, nextHeartRate));
+        setCurrentHeartRate(bounded);
         setHeartRateReadings((readings) => [...readings.slice(-179), bounded]);
-        return bounded;
+        return nextSeconds;
       });
     }, 1000);
 
@@ -54,12 +57,14 @@ export default function WorkoutScreen({ profile, onWorkoutComplete }: WorkoutScr
     setElapsedSeconds(0);
     setHeartRateReadings([]);
     setCurrentHeartRate(profile.targetHeartRateMin + 8);
+    setStatusMessage('Workout running...');
     startAtRef.current = new Date();
   };
 
   const stopWorkout = async () => {
     if (!startAtRef.current || elapsedSeconds < 10) {
       setRunning(false);
+      setStatusMessage('Workout discarded: sessions under 10 seconds are not saved.');
       return;
     }
 
@@ -80,6 +85,7 @@ export default function WorkoutScreen({ profile, onWorkoutComplete }: WorkoutScr
     };
 
     await onWorkoutComplete(workout);
+    setStatusMessage('Workout saved successfully.');
     setSaving(false);
   };
 
@@ -110,6 +116,7 @@ export default function WorkoutScreen({ profile, onWorkoutComplete }: WorkoutScr
       <Text style={styles.hint}>
         Sessions shorter than 10 seconds are ignored to keep analytics clean.
       </Text>
+      <Text style={styles.statusText}>{statusMessage}</Text>
     </View>
   );
 }
@@ -190,5 +197,12 @@ const styles = StyleSheet.create({
     color: '#64748b',
     fontSize: 12,
     textAlign: 'center',
+  },
+  statusText: {
+    marginTop: 10,
+    color: '#0f172a',
+    fontSize: 13,
+    textAlign: 'center',
+    fontWeight: '500',
   },
 });

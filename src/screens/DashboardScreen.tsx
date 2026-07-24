@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import StatCard from '../components/StatCard';
 import { UserProfile, WorkoutSession } from '../types/cardio';
@@ -16,14 +16,15 @@ const isInLastDays = (dateString: string, days: number) => {
 
 export default function DashboardScreen({ workouts, profile }: DashboardScreenProps) {
   const [liveHeartRate, setLiveHeartRate] = useState(profile.targetHeartRateMin + 10);
+  const tickRef = useRef(0);
 
   useEffect(() => {
     const id = setInterval(() => {
-      setLiveHeartRate((previous) => {
-        const drift = Math.floor(Math.random() * 11) - 5;
-        const next = previous + drift;
-        return Math.max(profile.targetHeartRateMin - 15, Math.min(profile.targetHeartRateMax + 10, next));
-      });
+      tickRef.current += 1;
+      const zoneMidpoint = (profile.targetHeartRateMin + profile.targetHeartRateMax) / 2;
+      const amplitude = Math.max(6, Math.round((profile.targetHeartRateMax - profile.targetHeartRateMin) / 2));
+      const nextHeartRate = Math.round(zoneMidpoint + Math.sin(tickRef.current / 2.5) * amplitude);
+      setLiveHeartRate(Math.max(profile.targetHeartRateMin - 15, Math.min(profile.targetHeartRateMax + 10, nextHeartRate)));
     }, 2000);
 
     return () => clearInterval(id);

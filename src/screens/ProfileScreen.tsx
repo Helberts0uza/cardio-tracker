@@ -17,10 +17,11 @@ export default function ProfileScreen({ profile, onSave }: ProfileScreenProps) {
       return;
     }
 
-    const numericValue = Number(value.replace(/[^0-9]/g, ''));
+    const digitsOnly = value.replace(/[^0-9]/g, '');
+    const numericValue = digitsOnly.length === 0 ? 0 : Number(digitsOnly);
     setForm((current) => ({
       ...current,
-      [field]: Number.isNaN(numericValue) ? 0 : numericValue,
+      [field]: numericValue,
     }));
   };
 

@@ -54,5 +54,10 @@ export const loadCardioData = async (): Promise<CardioData> => {
 };
 
 export const saveCardioData = async (data: CardioData) => {
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error('Failed to save cardio data', error);
+    throw error;
+  }
 };
